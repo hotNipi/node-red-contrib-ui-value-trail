@@ -80,7 +80,6 @@ module.exports = function (RED) {
 			var done = null;
 			var range = null;
 			var site = null;		
-			var exactPosition = null;
 			var ensureNumber = null;
 			var getSiteProperties = null;
 			var getPosition = null;
@@ -91,23 +90,17 @@ module.exports = function (RED) {
 			
 			if (checkConfig(node, config)) {	
 				
-				ensureNumber = function (input,dets) {
+				ensureNumber = function (input) {
 					if (input === undefined) {
 						return config.min;
 					}
 					if (typeof input !== "number") {
 						var inputString = input.toString();
-						input = dets !== 0 ? parseFloat(inputString) : parseInt(inputString);
+						input =  parseFloat(inputString)
 						if(isNaN(input)){
 							node.warn("msg.payload does not contain numeric value")
 							return config.min
 						}						
-					}
-					if (dets > 0) { 
-						input = parseFloat(input.toFixed(dets))
-					}
-					else{
-						input = parseInt(input)
 					}
 					if(isNaN(input)){
 						node.warn("msg.payload does not contain numeric value")
@@ -157,8 +150,7 @@ module.exports = function (RED) {
 				}
 				
 				createPoints = function(){
-					var pt = ""
-					var po
+					var pt = ""				
 					var podata = []
 					var val = []
 					var step = config.exactwidth / config.count				
@@ -236,6 +228,9 @@ module.exports = function (RED) {
 						}	
 						var fem = {}			
 						var valid = true
+												
+						msg.payload = ensureNumber(msg.payload)
+												
 						if(config.max < msg.payload){
 							config.max = msg.payload
 							valid = false							
@@ -260,12 +255,11 @@ module.exports = function (RED) {
 							recalculate()
 						}					
 						config.points.values.push(msg.payload)
-						config.points.values.shift()
-											
+						config.points.values.shift()											
 						config.points.calculated.push(getPosition(msg.payload,config.min,config.max))
-						config.points.calculated.shift()
-						
+						config.points.calculated.shift()						
 						config.points.formatted = formatPoints(config.points.calculated)
+						
 						fem.payload = config.points.formatted									
 						
 						return { msg: fem };
