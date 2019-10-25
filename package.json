@@ -1,0 +1,26 @@
+{
+    "name": "node-red-contrib-ui-value-trail",
+    "version": "0.1.0",
+    "description": "A Node-RED dashboard ui node. Numeric value with trail",
+    "main": "ui-value-trail.js",
+    "node-red": {
+        "nodes": {
+            "ui-value-trail": "ui-value-trail.js"
+        }
+    },
+    "keywords": [
+        "node-red",
+        "value-trail",
+        "value with chart",
+        "dashboard"
+    ],
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/hotNipi/node-red-contrib-ui-value-trail.git"
+    },
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "author": "hotNipi <nipnippel@gmail.com>",
+    "license": "MIT"
+}
