@@ -4,6 +4,7 @@
 
 [![NPM version][npm-image]][npm-url]
 [![CodeFactor](https://www.codefactor.io/repository/github/hotnipi/node-red-contrib-ui-value-trail/badge)](https://www.codefactor.io/repository/github/hotnipi/node-red-contrib-ui-value-trail)
+![npm](https://img.shields.io/npm/dm/node-red-contrib-ui-value-trail)
 
 [npm-image]: http://img.shields.io/npm/v/node-red-contrib-ui-value-trail.svg
 [npm-url]: https://npmjs.org/package/node-red-contrib-ui-value-trail
