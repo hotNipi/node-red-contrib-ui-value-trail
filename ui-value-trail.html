@@ -101,28 +101,24 @@ SOFTWARE.
         <input type='hidden' id='node-input-width'>
         <input type='hidden' id='node-input-height'>
         <button class='editor-button' id='node-input-size'></button>
-    </div>  
-    
-</br>
-    
+    </div>      
+</br>    
     <div class='form-row' id='node-input-linecolor'>
-        <label for='node-input-colorLine'><i class='fa fa-paint-brush'></i> Line color</span></label>
+        <label for='node-input-colorFromTheme' style='padding-top:6px; padding-bottom:6px'><i class='fa fa-paint-brush'></i> Line color</span></label>
         <input type="checkbox" id="node-input-colorFromTheme" checked style="display:inline-block; width:auto; vertical-align:baseline; margin-right:5px;">Use theme color
         <span for='node-input-colorLine' id='node-input-colorLineSpan' style='margin-left:20px;'>Custom color</span>
         <input type='color' id='node-input-colorLine' style='width:80px'/>
     </div>
     <div class='form-row' id='node-input-lineblur'>
-        <label for='node-input-blur'><i class='fa fa-paint-brush'></i> Line blur</span></label>
-        <input type="checkbox" id="node-input-blur" checked style="display:inline-block; width:auto; vertical-align:baseline; margin-right:5px;">Use blur       
+        <label for='node-input-blur'><i class='fa fa-paint-brush'></i> Line style</span></label>
+        <input type="checkbox" id="node-input-blur" checked style="display:inline-block; width:auto; vertical-align:baseline; margin-right:5px;">Use glow       
     </div>
-
 </br>
     <div class='form-row'>
         <label for='node-input-pointcount'><i class='fa fa-gear'></i> Points per unit</label>
         <span for='node-input-pointcount'</span>
-        <input type='text' id='node-input-pointcount' style='width:80px' placeholder='8' dir=''>     
-    </div>  
-
+        <input type='number' id='node-input-pointcount' min='2' max='24' value='8' size='1' style='width:60px' >     
+    </div>
 </br>
     <div class='form-row'>
         <label for='node-input-name'><i class='icon-tag'></i> Name</label>
@@ -133,9 +129,9 @@ SOFTWARE.
     <p>Node-RED dashboard widget to show small trail of value history near some numeric value
     <p>Configurable options:
     <li>Color of line</li>
-    <li>Blur (on/off)</li>
+    <li>Glow (on/off)</li>
     <li>Amount of datapoints per unit. (2 ... 24)</li>
-<code>unit represents 1x1 Widget Size in dashboard Site configuration</code> 
+    <p style='margin-left: 30px'><code>unit</code> represents <code>1x1 Widget Size</code> in dashboard Site configuration</p>
  
 <h3>Input</h3>
 
