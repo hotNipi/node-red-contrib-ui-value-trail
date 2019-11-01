@@ -45,11 +45,8 @@ SOFTWARE.
             blur:{value:false},         
             colorLine: {value: '#ff9900'},          
             colorFromTheme:{value:true},
-            pointcount:{val:8, required: true, validate:function(v) {                 
-                    var mi = 2;
-                    var ma = 24;                   
-                    return (parseInt(v) >= mi && parseInt(v) <= ma)
-                }}
+            stroke:{value:2, required: true},
+            pointcount:{val:8, required: true}
                     
         },
         inputs:1,
@@ -73,7 +70,10 @@ SOFTWARE.
                 this.pointcount = 8;
                 $('#node-input-pointcount').val('8');
             }
-            
+            if (this.stroke === undefined) {
+                this.stroke = 2;
+                $('#node-input-stroke').val('2');
+            }
             $('#node-input-colorFromTheme').change(function() {                
                 if (this.checked == true) {                                 
                     $('#node-input-colorLine').hide();                  
@@ -115,6 +115,11 @@ SOFTWARE.
     </div>
 </br>
     <div class='form-row'>
+        <label for='node-input-stroke'><i class='fa fa-gear'></i> Stroke width</label>
+        <span for='node-input-stroke'</span>
+        <input type='number' id='node-input-stroke' min='1' max='6' value='2' size='1' style='width:60px' >     
+    </div>
+    <div class='form-row'>
         <label for='node-input-pointcount'><i class='fa fa-gear'></i> Points per unit</label>
         <span for='node-input-pointcount'</span>
         <input type='number' id='node-input-pointcount' min='2' max='24' value='8' size='1' style='width:60px' >     
@@ -130,6 +135,7 @@ SOFTWARE.
     <p>Configurable options:
     <li>Color of line</li>
     <li>Glow (on/off)</li>
+    <li>Stroke width (1 ... 6)</li>
     <li>Amount of datapoints per unit. (2 ... 24)</li>
     <p style='margin-left: 30px'><code>unit</code> represents <code>1x1 Widget Size</code> in dashboard Site configuration</p>
  

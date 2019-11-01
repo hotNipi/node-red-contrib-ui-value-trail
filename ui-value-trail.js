@@ -22,40 +22,28 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-
-{/* <feColorMatrix type="matrix" 
-result="color" 
-values="1 0 0 0 0
-		0 0 0 0 0
-		0 0 0 0 0
-		0 0 0 1 0"/> */}
-
 module.exports = function (RED) {
 	function HTML(config) {			
 		var layout = String.raw`		
 			<svg preserveAspectRatio="xMidYMid meet" id="vatra_svg_{{unique}}" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
-			<defs>
-				<filter id="dropShadow_{{unique}}">
-					<feGaussianBlur in="SourceAlpha" stdDeviation="3" result="blur1" />
-					<feFlood flood-color=`+config.color+` result="color"/>
-					<feComposite in="color" in2="blur1" operator="in" result="sombra" />
+				<defs>
+					<filter id="dropShadow_{{unique}}">
+						<feGaussianBlur in="SourceAlpha" stdDeviation="3" result="blur1" />
+						<feFlood flood-color=`+config.color+` result="color"/>
+						<feComposite in="color" in2="blur1" operator="in" result="sombra" />
 							<feOffset dx="0" dy="0" />
 							<feMerge>
 								<feMergeNode />
 								<feMergeNode in="SourceGraphic" />
 							</feMerge>
-						</filter>
-			
-			</defs>	
-			<polyline ng-if="${config.blur == true}" id="vatra_line_{{unique}}" points="0,0 0,0" style="fill:none;stroke:`+config.color+`;stroke-width:2" filter="url(#dropShadow_{{unique}})"/>
-			<polyline ng-if="${config.blur == false}" id="vatra_line_{{unique}}" points="0,0 0,0" style="fill:none;stroke:`+config.color+`;stroke-width:2"/>	
-			</svg>`
+					</filter>				
+				</defs>	
+				<polyline ng-if="${config.blur == true}" id="vatra_line_{{unique}}" points="0,0 0,0" style="fill:none;stroke:`+config.color+`;stroke-width:`+config.stroke+`" filter="url(#dropShadow_{{unique}})"/>
+				<polyline ng-if="${config.blur == false}" id="vatra_line_{{unique}}" points="0,0 0,0" style="fill:none;stroke:`+config.color+`;stroke-width:`+config.stroke+`"/>	
+			</svg>`			
 		
-		
-		var html = String.raw`${layout}`
-		return html;
+		return String.raw`${layout}`;
 	}
-
 
 	function checkConfig(node, conf) {
 		if (!conf || !conf.hasOwnProperty("group")) {
@@ -69,14 +57,11 @@ module.exports = function (RED) {
 
 	function ValueTrailNode(config) {
 		try {
-			var node = this;
-			
+			var node = this;			
 			if (ui === undefined) {
 				ui = RED.require("node-red-dashboard")(RED);
-			}
-			
-			RED.nodes.createNode(this, config);
-			
+			}			
+			RED.nodes.createNode(this, config);			
 			var done = null;
 			var range = null;
 			var site = null;		
@@ -86,10 +71,8 @@ module.exports = function (RED) {
 			var getCount = null;
 			var createPoints = null;
 			var formatPoints = null;
-			var recalculate = null;
-			
-			if (checkConfig(node, config)) {	
-				
+			var recalculate = null;			
+			if (checkConfig(node, config)) {				
 				ensureNumber = function (input) {
 					if (input === undefined) {
 						return config.min;
@@ -116,12 +99,10 @@ module.exports = function (RED) {
 						opts.theme = ui.getTheme();
 					}	
 					if(opts === null){
-						// fallback to hardcoded defaults					
 						node.log("Couldn't reach to the site parameters. Using hardcoded default parameters!")
 						opts = {}
 						opts.sizes = { sx: 48, sy: 48, gx: 4, gy: 4, cx: 4, cy: 4, px: 4, py: 4 }
-						opts.theme = {"widget-textColor":{value:"#eeeeee"}}
-						
+						opts.theme = {'widget-backgroundColor':{value:"#097479"}}						
 					}									
 					return opts
 				}
@@ -135,25 +116,20 @@ module.exports = function (RED) {
 						return Math.round(n);
 					}				
 					return n					
-				}				
-				
-		
-			 	
-				
+				}	
 				getPosition = function(target,min,max){
 					var p =  {minin:min, maxin:max+0.00001, minout:config.exactheight, maxout:1}
 					return range(target,p,true)
 				}
 				
 				getCount = function(){				
-					return parseInt(config.width * config.pointcount)
-				}
-				
+					return parseInt(config.width* config.pointcount)
+				}				
 				createPoints = function(){
 					var pt = ""				
 					var podata = []
 					var val = []
-					var step = config.exactwidth / config.count				
+					var step = config.exactwidth / config.count					
 					var y = parseInt(config.exactheight/2)
 					for (var i = 0; i < config.count; i++) {												
 						pt += step * i+','+y+' '
@@ -161,26 +137,20 @@ module.exports = function (RED) {
 						podata.push(y)
 					}
 					return {values:val,calculated:podata,formatted:pt}
-				}
-				
+				}				
 				formatPoints = function (p){
 					var pt = ""
-					var step = Math.floor(config.exactwidth / config.count)	
+					var step = config.exactwidth / config.count	
 					for (var i = 0; i < config.count; i++) {												
 						pt += step * i+','+p[i]+' '						
 					}
 					return pt
-				}
-				
-				recalculate = function(){
-					//var p = config.points
+				}				
+				recalculate = function(){					
 					for (var i = 0; i < config.count; i++) {
 						config.points.calculated[i] = getPosition(config.points.values[i],config.min,config.max)
-					}
-					//config.points = p
-				}
-
-				
+					}					
+				}				
 				var group = RED.nodes.getNode(config.group);
 				var site = getSiteProperties();				
 				if(config.width == 0){ config.width = parseInt(group.config.width) || 1}
@@ -190,22 +160,14 @@ module.exports = function (RED) {
 				config.exactwidth = parseInt(site.sizes.sx * config.width + site.sizes.cx * (config.width-1)) - 12;		
 				config.exactheight = parseInt(site.sizes.sy * config.height + site.sizes.cy * (config.height-1)) - 12;
 				config.count = getCount()
-				config.points = createPoints()
-				
-				config.color = site.theme['widget-backgroundColor'].value
-				
+				config.points = createPoints()				
+				config.color = site.theme['widget-backgroundColor'].value				
 				if(config.colorFromTheme == false){
 					config.color = config.colorLine
-				}
-				
+				}				
 				config.min = Number.MAX_VALUE
-				config.max = Number.MIN_VALUE
-				
-				//console.log(config)
-				
-				
-				
-				var html = HTML(config);				
+				config.max = Number.MIN_VALUE				
+				var html = HTML(config);		
 				
 				done = ui.addWidget({
 					node: node,
@@ -217,7 +179,7 @@ module.exports = function (RED) {
 					templateScope: "local",
 					emitOnlyNewValues: false,
 					forwardInputMessages: true,
-					storeFrontEndInputAsState: true,					
+					storeFrontEndInputAsState: true,				
 					
 					beforeEmit: function (msg) {
 						if(msg.payload === undefined){
@@ -266,7 +228,7 @@ module.exports = function (RED) {
 					},
 					
 					initController: function ($scope) {																		
-						$scope.unique = $scope.$eval('$id')						
+						$scope.unique = $scope.$eval('$id')				
 						
 						var updateLine = function (p){
 							var line = document.getElementById("vatra_line_"+$scope.unique);

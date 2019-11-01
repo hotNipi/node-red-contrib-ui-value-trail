@@ -24,6 +24,7 @@ By all this I want to say that with this widget you can get primary conditions o
 Configurable options:
 * Color of line
 * Glow (on/off)
+* Stroke width (1 ... 6)
 * Amount of datapoints per unit. (2 ... 24)
 > `unit represents 1x1 Widget Size in dashboard Site configuration` 
  
