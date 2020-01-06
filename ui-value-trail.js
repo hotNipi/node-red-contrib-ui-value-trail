@@ -23,9 +23,25 @@ SOFTWARE.
 */
 
 module.exports = function (RED) {
-	function HTML(config) {			
+	function HTML(config) {	
+		var styles = String.raw`
+		<style>
+			.vatra-txt-{{unique}} {					
+				fill: currentColor;	
+			}					
+			.vatra-txt-{{unique}}.small{
+				font-size:0.6em;
+			}
+			.vatra-svg-{{unique}}{
+				outline: none;
+				border: 0;
+				width: 100%;
+				height: 100%;
+			}			
+		</style>`	
+		
 		var layout = String.raw`		
-			<svg preserveAspectRatio="xMidYMid meet" id="vatra_svg_{{unique}}" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
+			<svg preserveAspectRatio="xMidYMid meet" id="vatra_svg_{{unique}}" xmlns="http://www.w3.org/2000/svg" ng-click='toggle()' class="vatra-svg-{{unique}}">
 				<defs>
 					<filter id="dropShadow_{{unique}}">
 						<feGaussianBlur in="SourceAlpha" stdDeviation="3" result="blur1" />
@@ -39,10 +55,12 @@ module.exports = function (RED) {
 					</filter>				
 				</defs>	
 				<polyline ng-if="${config.blur == true}" id="vatra_line_{{unique}}" points="0,0 0,0" style="fill:none;stroke:`+config.color+`;stroke-width:`+config.stroke+`" filter="url(#dropShadow_{{unique}})"/>
-				<polyline ng-if="${config.blur == false}" id="vatra_line_{{unique}}" points="0,0 0,0" style="fill:none;stroke:`+config.color+`;stroke-width:`+config.stroke+`"/>	
+				<polyline ng-if="${config.blur == false}" id="vatra_line_{{unique}}" points="0,0 0,0" style="fill:none;stroke:`+config.color+`;stroke-width:`+config.stroke+`"/>				
+				<text id=vatra_max_{{unique}} class="vatra-txt-{{unique}} small" text-anchor="start" dominant-baseline="hanging" x="0" y="0" visibility="hidden">`+config.max+`</text>					
+				<text id=vatra_min_{{unique}} class="vatra-txt-{{unique}} small" text-anchor="start" dominant-baseline="baseline" x="0" y="100%"  visibility="hidden">`+config.min+`</text>	
 			</svg>`			
 		
-		return String.raw`${layout}`;
+		return String.raw`${styles}${layout}`;
 	}
 
 	function checkConfig(node, conf) {
@@ -214,7 +232,7 @@ module.exports = function (RED) {
 							}							
 						}						
 						if(valid == false){
-							recalculate()
+							recalculate()							
 						}					
 						config.points.values.push(msg.payload)
 						config.points.values.shift()											
@@ -222,30 +240,59 @@ module.exports = function (RED) {
 						config.points.calculated.shift()						
 						config.points.formatted = formatPoints(config.points.calculated)
 						
-						fem.payload = config.points.formatted									
+						fem.payload = {points:config.points.formatted,limits:{min:config.min,max:config.max}}															
 						
 						return { msg: fem };
 					},
 					
 					initController: function ($scope) {																		
-						$scope.unique = $scope.$eval('$id')				
+						$scope.unique = $scope.$eval('$id')
+						$scope.togglevalue = 'hiden'
+						
+						$scope.toggle = function(){							
+							$scope.togglevalue = $scope.togglevalue == 'visible' ? 'hidden' : 'visible'
+							toggleMinMax()
+						}
+						
+						var toggleMinMax = function (){							
+							var tick = document.getElementById("vatra_max_"+$scope.unique);
+							if(tick){							
+								$(tick).attr('visibility',$scope.togglevalue)
+							}
+							tick = document.getElementById("vatra_min_"+$scope.unique);
+							if(tick){								
+								$(tick).attr('visibility',$scope.togglevalue)
+							}		
+						}
 						
 						var updateLine = function (p){
 							var line = document.getElementById("vatra_line_"+$scope.unique);
 							if(line){
 								line.setAttributeNS(null, 'points', p);
 							}	
-						}								
+						}
+						
+						var updateLimits = function (limits){					
+							$("[id*='statra_tickval_"+$scope.unique+"']").text('') 							
+							var tick = document.getElementById("vatra_max_"+$scope.unique);
+							if(tick){								
+								$(tick).text(parseFloat(limits.max.toFixed(2)));
+							}
+							tick = document.getElementById("vatra_min_"+$scope.unique);
+							if(tick){								
+								$(tick).text(parseFloat(limits.min.toFixed(2)));
+							}							
+					   }		
+														
 						$scope.$watch('msg', function (msg) {
 							if (!msg) {								
 								return;
 							}
 							if(msg.payload){							
-								updateLine(msg.payload)	
-							}						
-																			
-						});
-						
+								updateLine(msg.payload.points)
+								updateLimits(msg.payload.limits)		
+							}																			
+						});						
 					}
 				});
 			}
