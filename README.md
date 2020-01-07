@@ -13,7 +13,7 @@ Node-RED dashboard widget to show small trail of value history near some numeric
 ![node-red-contrib-ui-value-trail.jpg](images/node-red-contrib-ui-value-trail.jpg)
 
 ## Preface
-The value trail is not as regular line chart. There is no time component involved. Every incoming payload creates new datapoint. All currently visible datapoints are evenly distributed along x-axis. Also, there is not tick marks or any reference values like minimum or maximum presented. 
+The value trail is not as regular line chart. There is no time component involved. Every incoming payload creates new datapoint. All currently visible datapoints are evenly distributed along x-axis.
 
 This means that by looking on value trail you can easily detect rising or falling conditions. Or say things like *"Resistance value is ok at 543 kilo-ohm’s, but I don't like this strange peak"* or *"Pressure needs some maintenance cos it shows too much instability"*
 
@@ -24,6 +24,7 @@ By all this I want to say that with this widget you can get primary conditions o
 Configurable options:
 * Color of line
 * Glow (on/off)
+* Show min/max values. You can always toggle min/max values at runtime by clicking on widget area. Configuration is for initial state.
 * Stroke width (1 ... 6)
 * Amount of datapoints per unit. (2 ... 24)
 > `unit represents 1x1 Widget Size in dashboard Site configuration` 

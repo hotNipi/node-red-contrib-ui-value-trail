@@ -42,7 +42,8 @@ SOFTWARE.
             height: {value: 0},
             name: {value: ''},
             label:{value: ''},
-            blur:{value:false},         
+            blur:{value:false},
+            minmax:{value:false},         
             colorLine: {value: '#ff9900'},          
             colorFromTheme:{value:true},
             stroke:{value:2, required: true},
@@ -65,6 +66,9 @@ SOFTWARE.
            
             if (this.blur === undefined) {
                 $("#node-input-blur").prop('checked', false);
+            }
+            if (this.minmax === undefined) {
+                $("#node-input-minmax").prop('checked', false);
             }
             if (this.pointcount === undefined) {
                 this.pointcount = 8;
@@ -113,6 +117,10 @@ SOFTWARE.
         <label for='node-input-blur'><i class='fa fa-paint-brush'></i> Line style</span></label>
         <input type="checkbox" id="node-input-blur" checked style="display:inline-block; width:auto; vertical-align:baseline; margin-right:5px;">Use glow       
     </div>
+    <div class='form-row' id='node-input-limits'>
+        <label for='node-input-minmax'><i class='fa fa-paint-brush'></i> Min-Max</span></label>
+        <input type="checkbox" id="node-input-minmax" style="display:inline-block; width:auto; vertical-align:baseline; margin-right:5px;">Show by default       
+    </div>
 </br>
     <div class='form-row'>
         <label for='node-input-stroke'><i class='fa fa-gear'></i> Stroke width</label>
@@ -135,6 +143,7 @@ SOFTWARE.
     <p>Configurable options:
     <li>Color of line</li>
     <li>Glow (on/off)</li>
+    <li>Show min/max values (You can always toggle min/max values at runtime by clicking on widget area. Configuration is for initial state.)</li>
     <li>Stroke width (1 ... 6)</li>
     <li>Amount of datapoints per unit. (2 ... 24)</li>
     <p style='margin-left: 30px'><code>unit</code> represents <code>1x1 Widget Size</code> in dashboard Site configuration</p>

@@ -24,6 +24,9 @@ SOFTWARE.
 
 module.exports = function (RED) {
 	function HTML(config) {	
+		
+		var params = JSON.stringify({minmax:config.minmax});
+		
 		var styles = String.raw`
 		<style>
 			.vatra-txt-{{unique}} {					
@@ -41,7 +44,7 @@ module.exports = function (RED) {
 		</style>`	
 		
 		var layout = String.raw`		
-			<svg preserveAspectRatio="xMidYMid meet" id="vatra_svg_{{unique}}" xmlns="http://www.w3.org/2000/svg" ng-click='toggle()' class="vatra-svg-{{unique}}">
+			<svg preserveAspectRatio="xMidYMid meet" id="vatra_svg_{{unique}}" xmlns="http://www.w3.org/2000/svg" ng-click='toggle()' ng-init='init(`+params+`)' class="vatra-svg-{{unique}}">
 				<defs>
 					<filter id="dropShadow_{{unique}}">
 						<feGaussianBlur in="SourceAlpha" stdDeviation="3" result="blur1" />
@@ -136,6 +139,9 @@ module.exports = function (RED) {
 					return n					
 				}	
 				getPosition = function(target,min,max){
+					if(min == max){
+						return (config.exactheight/2)+4
+					}
 					var p =  {minin:min, maxin:max+0.00001, minout:config.exactheight, maxout:1}
 					return range(target,p,true)
 				}
@@ -248,6 +254,13 @@ module.exports = function (RED) {
 					initController: function ($scope) {																		
 						$scope.unique = $scope.$eval('$id')
 						$scope.togglevalue = 'hiden'
+						$scope.lastlimits = {min:0,max:0}
+						$scope.switch = false
+						
+						$scope.init = function(params){
+							$scope.togglevalue = params.minmax == false ? 'hidden' : 'visible'
+							$scope.switch = true
+						}
 						
 						$scope.toggle = function(){							
 							$scope.togglevalue = $scope.togglevalue == 'visible' ? 'hidden' : 'visible'
@@ -273,14 +286,18 @@ module.exports = function (RED) {
 						}
 						
 						var updateLimits = function (limits){					
-							$("[id*='statra_tickval_"+$scope.unique+"']").text('') 							
+							//$("[id*='statra_tickval_"+$scope.unique+"']").text('') 
+							if($scope.lastlimits.min == limits.min && $scope.lastlimits.max == limits.max){
+								return
+							}
+							$scope.lastlimits = limits							
 							var tick = document.getElementById("vatra_max_"+$scope.unique);
 							if(tick){								
-								$(tick).text(parseFloat(limits.max.toFixed(2)));
+								$(tick).text(parseFloat($scope.lastlimits.max.toFixed(2)));
 							}
 							tick = document.getElementById("vatra_min_"+$scope.unique);
 							if(tick){								
-								$(tick).text(parseFloat(limits.min.toFixed(2)));
+								$(tick).text(parseFloat($scope.lastlimits.min.toFixed(2)));
 							}							
 					   }		
 														
@@ -291,8 +308,15 @@ module.exports = function (RED) {
 							if(msg.payload){							
 								updateLine(msg.payload.points)
 								updateLimits(msg.payload.limits)		
+							}
+							if($scope.switch == true){
+								$scope.switch = false
+								toggleMinMax()
 							}																			
-						});						
+						});
+						$scope.$on('$destroy', function() {
+							$scope.lastlimits = {min:0,max:0}
+						}); 						
 					}
 				});
 			}
