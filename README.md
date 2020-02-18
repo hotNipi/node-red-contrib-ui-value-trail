@@ -10,7 +10,7 @@
 [npm-url]: https://npmjs.org/package/node-red-contrib-ui-value-trail
 Node-RED dashboard widget to show small trail of value history near some numeric value
 
-![node-red-contrib-ui-value-trail.jpg](images/node-red-contrib-ui-value-trail.jpg)
+![Node-RED dashboard widget node-red-contrib-ui-value-trail](images/node-red-contrib-ui-value-trail.jpg)
 
 ## Preface
 The value trail is not as regular line chart. There is no time component involved. Every incoming payload creates new datapoint. All currently visible datapoints are evenly distributed along x-axis.
