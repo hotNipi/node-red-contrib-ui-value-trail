@@ -25,7 +25,7 @@ SOFTWARE.
 module.exports = function (RED) {
 	function HTML(config) {	
 		
-		var params = JSON.stringify({minmax:config.minmax});
+		var params = JSON.stringify({minmax:config.minmax,padding:config.padding});
 		
 		var styles = String.raw`
 		<style>
@@ -190,7 +190,12 @@ module.exports = function (RED) {
 					config.color = config.colorLine
 				}				
 				config.min = Number.MAX_VALUE
-				config.max = Number.MIN_VALUE				
+				config.max = Number.MIN_VALUE	
+				
+				config.padding = {
+					hor:'6px',
+					vert:(site.sizes.sy/16)+'px'
+				}	
 				var html = HTML(config);		
 				
 				done = ui.addWidget({
@@ -256,15 +261,33 @@ module.exports = function (RED) {
 						$scope.togglevalue = 'hiden'
 						$scope.lastlimits = {min:0,max:0}
 						$scope.switch = false
+						$scope.padding = null
 						
 						$scope.init = function(params){
 							$scope.togglevalue = params.minmax == false ? 'hidden' : 'visible'
+							$scope.padding = params.padding
 							$scope.switch = true
+							updateContainerStyle()
 						}
 						
 						$scope.toggle = function(){							
 							$scope.togglevalue = $scope.togglevalue == 'visible' ? 'hidden' : 'visible'
 							toggleMinMax()
+						}
+
+						var updateContainerStyle = function(){
+							var el = document.getElementById("vatra_svg_"+$scope.unique);							
+							if(!el){
+								setTimeout(updateContainerStyle,40)
+								return
+							}	
+							el = el.parentElement					
+							if(el && el.classList.contains('nr-dashboard-template')){
+								if($(el).css('paddingLeft') == '0px'){
+									el.style.paddingLeft = el.style.paddingRight = $scope.padding.hor
+									el.style.paddingTop = el.style.paddingBottom = $scope.padding.vert
+								}
+							}							
 						}
 						
 						var toggleMinMax = function (){							
