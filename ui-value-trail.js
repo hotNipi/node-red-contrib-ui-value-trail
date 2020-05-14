@@ -189,9 +189,9 @@ module.exports = function (RED) {
 				if(config.colorFromTheme == false){
 					config.color = config.colorLine
 				}				
-				config.min = Number.MAX_VALUE
-				config.max = Number.MIN_VALUE	
-				
+				config.min = Number.MAX_SAFE_INTEGER 
+				config.max = Number.MIN_SAFE_INTEGER
+
 				config.padding = {
 					hor:'6px',
 					vert:(site.sizes.sy/16)+'px'
@@ -230,6 +230,7 @@ module.exports = function (RED) {
 							config.min = msg.payload
 							valid = false							
 						}
+						
 						if(valid == true){
 							var current = Math.max(...config.points.values)
 							if(config.max > current){
