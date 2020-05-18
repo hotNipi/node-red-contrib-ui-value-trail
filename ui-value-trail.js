@@ -92,7 +92,8 @@ module.exports = function (RED) {
 			var getCount = null;
 			var createPoints = null;
 			var formatPoints = null;
-			var recalculate = null;			
+			var recalculate = null;	
+			var getLimits = null;		
 			if (checkConfig(node, config)) {				
 				ensureNumber = function (input) {
 					if (input === undefined) {
@@ -148,6 +149,17 @@ module.exports = function (RED) {
 				
 				getCount = function(){				
 					return parseInt(config.width* config.pointcount)
+				}
+				getLimits = function(){					
+					var mi = config.min
+					var ma = config.max
+					if(mi === Number.MAX_SAFE_INTEGER){
+						mi = 0
+					}
+					if(ma === Number.MIN_SAFE_INTEGER){
+						ma = 0
+					}
+					return {min:mi,max:ma}
 				}				
 				createPoints = function(){
 					var pt = ""				
@@ -252,7 +264,7 @@ module.exports = function (RED) {
 						config.points.calculated.shift()						
 						config.points.formatted = formatPoints(config.points.calculated)
 						
-						fem.payload = {points:config.points.formatted,limits:{min:config.min,max:config.max}}															
+						fem.payload = {points:config.points.formatted,limits:getLimits()}								
 						
 						return { msg: fem };
 					},
@@ -310,10 +322,6 @@ module.exports = function (RED) {
 						}
 						
 						var updateLimits = function (limits){					
-							//$("[id*='statra_tickval_"+$scope.unique+"']").text('') 
-							if($scope.lastlimits.min == limits.min && $scope.lastlimits.max == limits.max){
-								return
-							}
 							$scope.lastlimits = limits							
 							var tick = document.getElementById("vatra_max_"+$scope.unique);
 							if(tick){								
