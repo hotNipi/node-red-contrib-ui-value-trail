@@ -25,12 +25,14 @@ SOFTWARE.
 module.exports = function (RED) {
 	function HTML(config) {	
 		
-		var params = JSON.stringify({minmax:config.minmax,padding:config.padding});
+		var params = JSON.stringify({minmax:config.minmax,padding:config.padding,decimals:config.decimals});
 		
 		var styles = String.raw`
 		<style>
 			.vatra-txt-{{unique}} {					
 				fill: currentColor;	
+				font-size:${config.height * 1.5}em;
+				font-weight:bold;
 			}					
 			.vatra-txt-{{unique}}.small{
 				font-size:0.6em;
@@ -61,6 +63,7 @@ module.exports = function (RED) {
 				<polyline ng-if="${config.blur == false}" id="vatra_line_{{unique}}" points="0,0 0,0" style="fill:none;stroke:`+config.color+`;stroke-width:`+config.stroke+`"/>				
 				<text id=vatra_max_{{unique}} class="vatra-txt-{{unique}} small" text-anchor="start" dominant-baseline="hanging" x="0" y="0" visibility="hidden">`+config.max+`</text>					
 				<text id=vatra_min_{{unique}} class="vatra-txt-{{unique}} small" text-anchor="start" dominant-baseline="baseline" x="0" y="100%"  visibility="hidden">`+config.min+`</text>	
+				<text ng-if="${config.showvalue == true}" id=vatra_val_{{unique}} class="vatra-txt-{{unique}}" text-anchor="middle" dominant-baseline="baseline" x="50%" y="70%" ></text>
 			</svg>`			
 		
 		return String.raw`${styles}${layout}`;
@@ -203,7 +206,8 @@ module.exports = function (RED) {
 				}				
 				config.min = Number.MAX_SAFE_INTEGER 
 				config.max = Number.MIN_SAFE_INTEGER
-
+				config.property = config.property || "payload";
+				config.decimals = config.decimals || 0
 				config.padding = {
 					hor:'6px',
 					vert:(site.sizes.sy/16)+'px'
@@ -222,24 +226,21 @@ module.exports = function (RED) {
 					forwardInputMessages: true,
 					storeFrontEndInputAsState: true,				
 					
-					beforeEmit: function (msg) {
-						if(msg.payload === undefined){
-							return 
-						}
+					beforeEmit: function (msg) {						
 						if(!config.points || !config.points.values){
 							return
 						}	
 						var fem = {}			
 						var valid = true
+						var val = RED.util.getMessageProperty(msg, config.property);						
+						val = ensureNumber(val)
 												
-						msg.payload = ensureNumber(msg.payload)
-												
-						if(config.max < msg.payload){
-							config.max = msg.payload
+						if(config.max < val){
+							config.max = val
 							valid = false							
 						}
-						if(config.min > msg.payload){
-							config.min = msg.payload
+						if(config.min > val){
+							config.min = val
 							valid = false							
 						}
 						
@@ -258,13 +259,13 @@ module.exports = function (RED) {
 						if(valid == false){
 							recalculate()							
 						}					
-						config.points.values.push(msg.payload)
+						config.points.values.push(val)
 						config.points.values.shift()											
-						config.points.calculated.push(getPosition(msg.payload,config.min,config.max))
+						config.points.calculated.push(getPosition(val,config.min,config.max))
 						config.points.calculated.shift()						
 						config.points.formatted = formatPoints(config.points.calculated)
 						
-						fem.payload = {points:config.points.formatted,limits:getLimits()}								
+						fem.payload = {points:config.points.formatted,limits:getLimits(),val:val}								
 						
 						return { msg: fem };
 					},
@@ -275,11 +276,13 @@ module.exports = function (RED) {
 						$scope.lastlimits = {min:0,max:0}
 						$scope.switch = false
 						$scope.padding = null
+						$scope.d = 0
 						
 						$scope.init = function(params){
 							$scope.togglevalue = params.minmax == false ? 'hidden' : 'visible'
 							$scope.padding = params.padding
 							$scope.switch = true
+							$scope.d = params.decimals
 							updateContainerStyle()
 						}
 						
@@ -325,13 +328,20 @@ module.exports = function (RED) {
 							$scope.lastlimits = limits							
 							var tick = document.getElementById("vatra_max_"+$scope.unique);
 							if(tick){								
-								$(tick).text(parseFloat($scope.lastlimits.max.toFixed(2)));
+								$(tick).text(parseFloat($scope.lastlimits.max.toFixed($scope.d)));
 							}
 							tick = document.getElementById("vatra_min_"+$scope.unique);
 							if(tick){								
-								$(tick).text(parseFloat($scope.lastlimits.min.toFixed(2)));
+								$(tick).text(parseFloat($scope.lastlimits.min.toFixed($scope.d)));
 							}							
-					   }		
+					   }
+					   var updateValue = function (v){												
+						var va = document.getElementById("vatra_val_"+$scope.unique);
+						if(va){								
+							$(va).text(parseFloat(v.toFixed($scope.d)));
+						}
+												
+				   }			
 														
 						$scope.$watch('msg', function (msg) {
 							if (!msg) {								
@@ -339,7 +349,8 @@ module.exports = function (RED) {
 							}
 							if(msg.payload){							
 								updateLine(msg.payload.points)
-								updateLimits(msg.payload.limits)		
+								updateLimits(msg.payload.limits)
+								updateValue(msg.payload.val)		
 							}
 							if($scope.switch == true){
 								$scope.switch = false

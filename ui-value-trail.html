@@ -43,10 +43,13 @@ SOFTWARE.
             name: {value: ''},
             label:{value: ''},
             blur:{value:false},
-            minmax:{value:false},         
+            minmax:{value:false},
+            showvalue:{value:false},
+            decimals: { value: 0, required: false, validate: RED.validators.number() },         
             colorLine: {value: '#ff9900'},          
             colorFromTheme:{value:true},
             stroke:{value:2, required: true},
+            property: { value: "payload", required: true },
             pointcount:{val:8, required: true}
                     
         },
@@ -70,10 +73,17 @@ SOFTWARE.
             if (this.minmax === undefined) {
                 $("#node-input-minmax").prop('checked', false);
             }
+            if (this.showvalue === undefined) {
+                $("#node-input-showvalue").prop('checked', false);
+            }
             if (this.pointcount === undefined) {
                 this.pointcount = 8;
                 $('#node-input-pointcount').val('8');
             }
+            if (this.property === undefined) {
+                $("#node-input-property").val("payload");
+            }
+            $("#node-input-property").typedInput({ default: 'msg', types: ['msg'] });
             if (this.stroke === undefined) {
                 this.stroke = 2;
                 $('#node-input-stroke').val('2');
@@ -105,6 +115,10 @@ SOFTWARE.
         <input type='hidden' id='node-input-width'>
         <input type='hidden' id='node-input-height'>
         <button class='editor-button' id='node-input-size'></button>
+    </div>
+    <div class="form-row">
+        <label for="node-input-property"><i class="fa fa-arrow-right"></i> Input</label>
+        <input type="text" id="node-input-property" style="width:70%;"/>
     </div>      
 </br>    
     <div class='form-row' id='node-input-linecolor'>
@@ -116,6 +130,12 @@ SOFTWARE.
     <div class='form-row' id='node-input-lineblur'>
         <label for='node-input-blur'><i class='fa fa-paint-brush'></i> Line style</span></label>
         <input type="checkbox" id="node-input-blur" checked style="display:inline-block; width:auto; vertical-align:baseline; margin-right:5px;">Use glow       
+    </div>
+    <div class='form-row' id='node-input-showvaluecheck'>
+        <label for='node-input-showvalue'><i class='fa fa-paint-brush'></i> Value</span></label>
+        <input type="checkbox" id="node-input-showvalue" style="display:inline-block; width:auto; vertical-align:baseline; margin-right:5px;">Show value
+        <span for='node-input-decimals' style='margin-left:20px;'>decimals</span>
+        <input type='text' id='node-input-decimals' style='width:80px' placeholder='0' dir=''>       
     </div>
     <div class='form-row' id='node-input-limits'>
         <label for='node-input-minmax'><i class='fa fa-paint-brush'></i> Min-Max</span></label>
@@ -143,6 +163,7 @@ SOFTWARE.
     <p>Configurable options:
     <li>Color of line</li>
     <li>Glow (on/off)</li>
+    <li>Show value (on/off) with rounding option (default is 0 so value is shown as integer)</li>
     <li>Show min/max values (You can always toggle min/max values at runtime by clicking on widget area. Configuration is for initial state.)</li>
     <li>Stroke width (1 ... 6)</li>
     <li>Amount of datapoints per unit. (2 ... 24)</li>
@@ -150,5 +171,5 @@ SOFTWARE.
  
 <h3>Input</h3>
 
- The <code>msg.payload</code> should carry single numeric value. 
+ Configured <code>input property</code> should carry single numeric value. 
 </script>
