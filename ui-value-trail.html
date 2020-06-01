@@ -42,6 +42,7 @@ SOFTWARE.
             height: {value: 0},
             name: {value: ''},
             label:{value: ''},
+            unit:{value: ''},
             blur:{value:false},
             minmax:{value:false},
             showvalue:{value:false},
@@ -135,7 +136,9 @@ SOFTWARE.
         <label for='node-input-showvalue'><i class='fa fa-paint-brush'></i> Value</span></label>
         <input type="checkbox" id="node-input-showvalue" style="display:inline-block; width:auto; vertical-align:baseline; margin-right:5px;">Show value
         <span for='node-input-decimals' style='margin-left:20px;'>decimals</span>
-        <input type='text' id='node-input-decimals' style='width:80px' placeholder='0' dir=''>       
+        <input type='text' id='node-input-decimals' style='width:40px' placeholder='0' dir=''> 
+        <span for='node-input-unit' style='margin-left:20px;'>unit</span>
+        <input type='text' id='node-input-unit' style='width:40px' placeholder='%' dir=''>      
     </div>
     <div class='form-row' id='node-input-limits'>
         <label for='node-input-minmax'><i class='fa fa-paint-brush'></i> Min-Max</span></label>

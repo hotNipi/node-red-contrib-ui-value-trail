@@ -25,13 +25,13 @@ SOFTWARE.
 module.exports = function (RED) {
 	function HTML(config) {	
 		
-		var params = JSON.stringify({minmax:config.minmax,padding:config.padding,decimals:config.decimals});
+		var params = JSON.stringify({minmax:config.minmax,padding:config.padding,decimals:config.decimals,unit:config.unit});
 		
 		var styles = String.raw`
 		<style>
 			.vatra-txt-{{unique}} {					
 				fill: currentColor;	
-				font-size:${config.height * 1.5}em;
+				font-size:${config.height > 4 ? 4 : config.height}em;
 				font-weight:bold;
 			}					
 			.vatra-txt-{{unique}}.small{
@@ -117,18 +117,18 @@ module.exports = function (RED) {
 					return input;
 				}
 				getSiteProperties = function(){
-					var opts = null;					
+					var opts = {}
+					opts.sizes = { sx: 48, sy: 48, gx: 4, gy: 4, cx: 4, cy: 4, px: 4, py: 4 }
+					opts.theme = {'widget-backgroundColor':{value:"#097479"}}						
 					if (typeof ui.getSizes === "function") {			
-						opts = {};
-						opts.sizes = ui.getSizes();
-						opts.theme = ui.getTheme();
-					}	
-					if(opts === null){
-						node.log("Couldn't reach to the site parameters. Using hardcoded default parameters!")
-						opts = {}
-						opts.sizes = { sx: 48, sy: 48, gx: 4, gy: 4, cx: 4, cy: 4, px: 4, py: 4 }
-						opts.theme = {'widget-backgroundColor':{value:"#097479"}}						
-					}									
+						if(ui.getSizes()){
+							opts.sizes = ui.getSizes();
+						}
+						if(ui.getTheme()){
+							opts.theme = ui.getTheme();
+						}
+					}
+													
 					return opts
 				}
 				range = function (n,p,r){					
@@ -208,6 +208,7 @@ module.exports = function (RED) {
 				config.max = Number.MIN_SAFE_INTEGER
 				config.property = config.property || "payload";
 				config.decimals = config.decimals || 0
+				config.unit = config.unit || ""
 				config.padding = {
 					hor:'6px',
 					vert:(site.sizes.sy/16)+'px'
@@ -277,12 +278,14 @@ module.exports = function (RED) {
 						$scope.switch = false
 						$scope.padding = null
 						$scope.d = 0
+						$scope.u = ''
 						
 						$scope.init = function(params){
 							$scope.togglevalue = params.minmax == false ? 'hidden' : 'visible'
 							$scope.padding = params.padding
 							$scope.switch = true
 							$scope.d = params.decimals
+							$scope.u = params.unit
 							updateContainerStyle()
 						}
 						
@@ -338,7 +341,7 @@ module.exports = function (RED) {
 					   var updateValue = function (v){												
 						var va = document.getElementById("vatra_val_"+$scope.unique);
 						if(va){								
-							$(va).text(parseFloat(v.toFixed($scope.d)));
+							$(va).text(parseFloat(v.toFixed($scope.d))+$scope.u);
 						}
 												
 				   }			
