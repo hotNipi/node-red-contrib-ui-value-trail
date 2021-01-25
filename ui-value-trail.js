@@ -25,7 +25,7 @@ SOFTWARE.
 module.exports = function (RED) {
 	function HTML(config) {	
 		
-		var params = JSON.stringify({minmax:config.minmax,padding:config.padding,decimals:config.decimals,unit:config.unit});
+		var params = JSON.stringify({minmax:config.minmax,padding:config.padding,decimals:config.decimals,unit:config.unit,allowtoggle:config.allowtoggle});
 		
 		var styles = String.raw`
 		<style>
@@ -273,23 +273,32 @@ module.exports = function (RED) {
 					
 					initController: function ($scope) {																		
 						$scope.unique = $scope.$eval('$id')
+						$scope.waitingmessage = null;
+						$scope.inited = false
 						$scope.togglevalue = 'hiden'
 						$scope.lastlimits = {min:0,max:0}
 						$scope.switch = false
 						$scope.padding = null
+						$scope.allowtoggle = true
+
 						$scope.d = 0
 						$scope.u = ''
 						
 						$scope.init = function(params){
+							console.log(params)
 							$scope.togglevalue = params.minmax == false ? 'hidden' : 'visible'
 							$scope.padding = params.padding
 							$scope.switch = true
 							$scope.d = params.decimals
 							$scope.u = params.unit
+							$scope.allowtoggle = params.allowtoggle
 							updateContainerStyle()
 						}
 						
-						$scope.toggle = function(){							
+						$scope.toggle = function(){	
+							if($scope.allowtoggle == false){
+								return
+							}						
 							$scope.togglevalue = $scope.togglevalue == 'visible' ? 'hidden' : 'visible'
 							toggleMinMax()
 						}
@@ -299,13 +308,20 @@ module.exports = function (RED) {
 							if(!el){
 								setTimeout(updateContainerStyle,40)
 								return
-							}	
+							}
+							$scope.inited = true	
 							el = el.parentElement					
 							if(el && el.classList.contains('nr-dashboard-template')){
 								if($(el).css('paddingLeft') == '0px'){
 									el.style.paddingLeft = el.style.paddingRight = $scope.padding.hor
 									el.style.paddingTop = el.style.paddingBottom = $scope.padding.vert
 								}
+							}
+							if($scope.waitingmessage != null){
+								var m = {}
+								Object.assign(m, $scope.waitingmessage)
+								$scope.waitingmessage = null
+								update(m)
 							}							
 						}
 						
@@ -337,24 +353,32 @@ module.exports = function (RED) {
 							if(tick){								
 								$(tick).text(parseFloat($scope.lastlimits.min.toFixed($scope.d)));
 							}							
-					   }
-					   var updateValue = function (v){												
-						var va = document.getElementById("vatra_val_"+$scope.unique);
-						if(va){								
-							$(va).text(parseFloat(v.toFixed($scope.d))+$scope.u);
+					    }
+					    var updateValue = function (v){												
+							var va = document.getElementById("vatra_val_"+$scope.unique);
+							if(va){								
+								$(va).text(parseFloat(v.toFixed($scope.d))+$scope.u);
+							}												
 						}
-												
-				   }			
+						   
+						var update = function(m){
+							updateLine(m.payload.points)
+							updateLimits(m.payload.limits)
+							updateValue(m.payload.val)
+						}   
 														
 						$scope.$watch('msg', function (msg) {
 							if (!msg) {								
 								return;
 							}
-							if(msg.payload){							
-								updateLine(msg.payload.points)
-								updateLimits(msg.payload.limits)
-								updateValue(msg.payload.val)		
+							if ($scope.inited == false) {
+								if($scope.waitingmessage == null){
+									$scope.waitingmessage = msg
+								}								
+								return
 							}
+							update(msg)
+							
 							if($scope.switch == true){
 								$scope.switch = false
 								toggleMinMax()

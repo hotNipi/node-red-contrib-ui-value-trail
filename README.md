@@ -25,7 +25,7 @@ Configurable options:
 * Color of line
 * Glow (on/off)
 * Show value (on/off) with rounding option (default is 0 so value is shown as integer)
-* Show min/max values. You can always toggle min/max values at runtime by clicking on widget area. Configuration is for initial state.
+* Show min/max values (initial state). You can restrict toggling the min/max values at runtime by unticking the Allow toggle option.
 * Stroke width (1 ... 6)
 * Amount of datapoints per unit. (2 ... 24)
 > `unit represents 1x1 Widget Size in dashboard Site configuration` 

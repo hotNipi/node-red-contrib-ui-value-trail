@@ -45,6 +45,7 @@ SOFTWARE.
             unit:{value: ''},
             blur:{value:false},
             minmax:{value:false},
+            allowtoggle:{value:true},
             showvalue:{value:false},
             decimals: { value: 0, required: false, validate: RED.validators.number() },         
             colorLine: {value: '#ff9900'},          
@@ -76,6 +77,9 @@ SOFTWARE.
             }
             if (this.showvalue === undefined) {
                 $("#node-input-showvalue").prop('checked', false);
+            }
+            if (this.allowtoggle === undefined) {
+                $("#node-input-allowtoggle").prop('checked', true);
             }
             if (this.pointcount === undefined) {
                 this.pointcount = 8;
@@ -142,7 +146,9 @@ SOFTWARE.
     </div>
     <div class='form-row' id='node-input-limits'>
         <label for='node-input-minmax'><i class='fa fa-paint-brush'></i> Min-Max</span></label>
-        <input type="checkbox" id="node-input-minmax" style="display:inline-block; width:auto; vertical-align:baseline; margin-right:5px;">Show by default       
+        <input type="checkbox" id="node-input-minmax" style="display:inline-block; width:auto; vertical-align:baseline; margin-right:5px;">Show by default
+        
+        <input type="checkbox" id="node-input-allowtoggle" checked style="display:inline-block; width:auto; vertical-align:baseline; margin-right:5px; margin-left:5px;">Allow toggle       
     </div>
 </br>
     <div class='form-row'>
@@ -167,7 +173,7 @@ SOFTWARE.
     <li>Color of line</li>
     <li>Glow (on/off)</li>
     <li>Show value (on/off) with rounding option (default is 0 so value is shown as integer)</li>
-    <li>Show min/max values (You can always toggle min/max values at runtime by clicking on widget area. Configuration is for initial state.)</li>
+    <li>Show min/max values (initial state). You can restrict toggling the min/max values at runtime by unticking the Allow toggle option.</li>
     <li>Stroke width (1 ... 6)</li>
     <li>Amount of datapoints per unit. (2 ... 24)</li>
     <p style='margin-left: 30px'><code>unit</code> represents <code>1x1 Widget Size</code> in dashboard Site configuration</p>
