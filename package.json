@@ -1,6 +1,6 @@
 {
     "name": "node-red-contrib-ui-value-trail",
-    "version": "0.2.1",
+    "version": "0.2.2",
     "description": "A Node-RED dashboard ui node. Numeric value with trail",
     "main": "ui-value-trail.js",
     "node-red": {
