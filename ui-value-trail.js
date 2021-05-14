@@ -26,7 +26,10 @@ module.exports = function (RED) {
 	function HTML(config) {	
 		
 		var params = JSON.stringify({minmax:config.minmax,padding:config.padding,decimals:config.decimals,unit:config.unit,allowtoggle:config.allowtoggle});
-		
+		var vis = config.minmax == true ? 'visible' : 'hidden'
+		var min = config.min == Number.MAX_SAFE_INTEGER ? 0 : config.min
+		var max = config.max == Number.MIN_SAFE_INTEGER ? 0 : config.max
+
 		var styles = String.raw`
 		<style>
 			.vatra-txt-{{unique}} {					
@@ -61,8 +64,8 @@ module.exports = function (RED) {
 				</defs>	
 				<polyline ng-if="${config.blur == true}" id="vatra_line_{{unique}}" points="0,0 0,0" style="fill:none;stroke:`+config.color+`;stroke-width:`+config.stroke+`" filter="url(#dropShadow_{{unique}})"/>
 				<polyline ng-if="${config.blur == false}" id="vatra_line_{{unique}}" points="0,0 0,0" style="fill:none;stroke:`+config.color+`;stroke-width:`+config.stroke+`"/>				
-				<text id=vatra_max_{{unique}} class="vatra-txt-{{unique}} small" text-anchor="start" dominant-baseline="hanging" x="0" y="0" visibility="hidden">`+config.max+`</text>					
-				<text id=vatra_min_{{unique}} class="vatra-txt-{{unique}} small" text-anchor="start" dominant-baseline="baseline" x="0" y="100%"  visibility="hidden">`+config.min+`</text>	
+				<text id=vatra_max_{{unique}} class="vatra-txt-{{unique}} small" text-anchor="start" dominant-baseline="hanging" x="0" y="0" visibility="${vis}">${max}</text>					
+				<text id=vatra_min_{{unique}} class="vatra-txt-{{unique}} small" text-anchor="start" dominant-baseline="baseline" x="0" y="100%"  visibility="${vis}">${min}</text>	
 				<text ng-if="${config.showvalue == true}" id=vatra_val_{{unique}} class="vatra-txt-{{unique}}" text-anchor="middle" dominant-baseline="baseline" x="50%" y="70%" ></text>
 			</svg>`			
 		
@@ -285,10 +288,9 @@ module.exports = function (RED) {
 						$scope.u = ''
 						
 						$scope.init = function(params){
-							console.log(params)
+							//console.log(params)
 							$scope.togglevalue = params.minmax == false ? 'hidden' : 'visible'
-							$scope.padding = params.padding
-							$scope.switch = true
+							$scope.padding = params.padding							
 							$scope.d = params.decimals
 							$scope.u = params.unit
 							$scope.allowtoggle = params.allowtoggle
@@ -325,7 +327,7 @@ module.exports = function (RED) {
 							}							
 						}
 						
-						var toggleMinMax = function (){							
+						var toggleMinMax = function () {
 							var tick = document.getElementById("vatra_max_"+$scope.unique);
 							if(tick){							
 								$(tick).attr('visibility',$scope.togglevalue)
@@ -379,10 +381,7 @@ module.exports = function (RED) {
 							}
 							update(msg)
 							
-							if($scope.switch == true){
-								$scope.switch = false
-								toggleMinMax()
-							}																			
+																									
 						});
 						$scope.$on('$destroy', function() {
 							$scope.lastlimits = {min:0,max:0}
